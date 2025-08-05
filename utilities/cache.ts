@@ -14,28 +14,14 @@ export async function loadMeteorites(): Promise<Meteorite[]> {
 
     if (meteoritesLoadingPromise) return await meteoritesLoadingPromise;
 
-    meteoritesLoadingPromise = (async () => {
-
-        try {
-
-            const data: MeteoritesKey | null = await readInFirebaseRTDB<MeteoritesKey>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH);
-
-            meteoritesCache = data ? Object.values(data) : [];
-
-            return meteoritesCache;
-
-        } catch (_err) {
-
-            return [];
-
-        } finally {
-
-            meteoritesLoadingPromise = null;
-            
-        }
+    meteoritesLoadingPromise = readInFirebaseRTDB<MeteoritesKey>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH)
         
-    })();
+        .then((data) => { return meteoritesCache = data ? Object.values(data) : [] })
+
+        .catch(() => []) 
+
+        .finally(() => { meteoritesLoadingPromise = null; });
 
     return await meteoritesLoadingPromise;
-    
+
 }
