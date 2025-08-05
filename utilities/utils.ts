@@ -1,4 +1,18 @@
-import { Meteorite } from "../types/types.ts";
+import { Config, Meteorite } from "../types/types.ts";
+
+export function isConfigValidWithMinValues(config: Config, rules: Partial<Record<keyof Config, number>>): boolean {
+
+    for (const [key, minValue] of Object.entries(rules)) {
+
+        const value = config[key as keyof Config];
+
+        if (typeof value !== "number" || value < (minValue ?? 0)) return false;
+
+    }
+
+    return true;
+
+}
 
 function haversine(latitude_1: number, longitude_1: number, latitude_2: number, longitude_2: number) {
 

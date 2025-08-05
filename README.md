@@ -42,6 +42,58 @@ HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
 * **FIREBASE\_URL & FIREBASE\_HIDDEN\_PATH:** Firebase database connection info. Make sure `"YOUR_SECRET_PATH"` **is strong, safe and secure**.
 * **HASH\_KEY:** Key used for IP hashing in rate limiting.
 
+### Open the `config.ts` file to customize settings:
+
+```ts
+export const config: Config = {
+
+  FIREBASE_URL: Deno.env.get("FIREBASE_HOST_LINK") ?? "",
+
+  FIREBASE_HIDDEN_PATH: Deno.env.get("FIREBASE_HIDDEN_PATH") ?? "",
+
+  HASH_KEY: Deno.env.get("HASH_KEY") ?? "",
+
+  RATE_LIMIT_INTERVAL_S: 1, // min: 1
+
+  MAX_READS_PER_DAY: 15, // min: 5
+
+  IPS_PURGE_TIME_DAYS: 1, // min: 1
+
+  FIREBASE_TIMEOUT_MS: 10000, // min: 6000
+
+  MAX_RANDOM_METEORITES: 1000, // min: 100
+
+  MAX_RETURNED_SEARCH_RESULTS: 300, // min: 100
+
+  MIN_RADIUS: 1, // min: 1
+
+  MAX_RADIUS: 5000, // min: 1000
+
+  DEFAULT_RANDOM_NUMBER_OF_METEORITES: 100 // min: 1000
+
+};
+```
+
+- **FIREBASE_URL**, **FIREBASE_HIDDEN_PATH**, **HASH_KEY**: These are values read from the `.env` file, so please **do not modify them**.
+
+- **RATE_LIMIT_INTERVAL_S** in [second]: This is the rate limit based on requests. Currently: one request per second.
+
+- **MAX_READS_PER_DAY** in [day]: Daily reading rate limit. Currently: 15 reads per day.
+
+- **IPS_PURGE_TIME_DAYS** in [day]: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Currently: 1 day.
+
+- **FIREBASE_TIMEOUT_MS** in [millisecond]: The timeout limit for HTTP requests to the Firebase Realtime Database. Currently: 10 seconds.
+
+- **MAX_RANDOM_METEORITES**: The maximum number of meteorites retrieved from `/random`. Currently: 1000 meteorites.
+ 
+- **MAX_RETURNED_SEARCH_RESULTS**: The maximum number of meteorites retrieved from `/search` when the result set is large.
+
+- **MIN_RADIUS** & **MAX_RADIUS**: The minimum and maximum radius values allowed by the API to define the circular search area. Currently: `min = 1` and `max = 500`.
+
+- **DEFAULT_RANDOM_NUMBER_OF_METEORITES**: In `/random`, if no `count` parameter is provided, this is the default number of meteorites retrieved. Currently: 100 meteorites.
+
+### Ensure that you respect the `min` value specified in the comment; otherwise, you will get an error message with your configuration.
+
 ### Run the server
 
 ```bash

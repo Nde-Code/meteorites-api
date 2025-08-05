@@ -4,11 +4,11 @@ import { getIp, checkTimeRateLimit, checkDailyRateLimit, hashIp } from "./utilit
 
 import { loadMeteorites } from "./utilities/cache.ts";
 
-import { Meteorite, filters } from "./types/types.ts";
+import { Config, Meteorite, filters } from "./types/types.ts";
 
 import { config } from "./config.ts";
 
-import { filterByDate, filterByLocation, filterByMass, getRecclassDistribution, getTrimmedParam, toNumber } from "./utilities/utils.ts";
+import { isConfigValidWithMinValues, filterByDate, filterByLocation, filterByMass, getRecclassDistribution, getTrimmedParam, toNumber } from "./utilities/utils.ts";
 
 async function handler(req: Request): Promise<Response> {
 
@@ -18,7 +18,31 @@ async function handler(req: Request): Promise<Response> {
 
 	const hashedIP: string = await hashIp(getIp(req));
 
+	const configMinValues: Partial<Record<keyof Config, number>> = {
+
+		RATE_LIMIT_INTERVAL_S: 1,
+
+		MAX_READS_PER_DAY: 5,
+
+		IPS_PURGE_TIME_DAYS: 1,
+
+		FIREBASE_TIMEOUT_MS: 6000, 
+
+		MAX_RANDOM_METEORITES: 100,
+
+		MAX_RETURNED_SEARCH_RESULTS: 100,
+
+		MIN_RADIUS: 1,
+
+		MAX_RADIUS: 1000,
+
+		DEFAULT_RANDOM_NUMBER_OF_METEORITES: 100
+
+	}
+
 	if (!config.FIREBASE_URL || !config.FIREBASE_HIDDEN_PATH || !config.HASH_KEY) return createJsonResponse({ "error": "Your credentials are missing." }, 500);
+
+	if (!isConfigValidWithMinValues(config, configMinValues)) return createJsonResponse({ "error": "Invalid configuration detected in your config.ts file. Please refer to the documentation."}, 500);
 
 	if (!hashedIP || hashedIP.length !== 64) return createJsonResponse({ "error": "Unable to hash your IP but it's required for security." }, 403);
 
