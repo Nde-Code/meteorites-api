@@ -10,10 +10,11 @@ This API is used in some projects:
 
 ## 🚀 Features  
 
-- CORS validation to allow requests only from authorized origins.
+- CORS: You're free to use the API in your website or any other project, but daily rate limits still apply.
 - Rate limiting implemented to prevent API abuse.
 - GDPR compliant: IP addresses are hashed using `SHA-256` with a strong, secure key and stored for max a day.
 - Data Purge: The `meteorite_data` stored in Firebase Realtime Database has been cleaned to remove incomplete records (e.g., missing location, ...).
+- Accurate Search: You can apply multiple filters to tailor the request as precisely as needed.
 
 ## 📦 Installation & Setup
 
@@ -36,12 +37,10 @@ Create a `.env` file in the root folder with:
 FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
 FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
 HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
-ALLOWED_ORIGINS=https://domain.com,https://another-domain.com,...
 ```
 
-* **FIREBASE\_URL & FIREBASE\_HIDDEN\_PATH:** Firebase database connection info. Make sure `FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH` **is strong safe and secure**.
+* **FIREBASE\_URL & FIREBASE\_HIDDEN\_PATH:** Firebase database connection info. Make sure `"YOUR_SECRET_PATH"` **is strong, safe and secure**.
 * **HASH\_KEY:** Key used for IP hashing in rate limiting.
-* **ALLOWED\_ORIGINS:** Comma-separated list of allowed origins for CORS.
 
 ### Run the server
 
@@ -50,6 +49,11 @@ deno task dev
 ```
 
 ## 📚 API Endpoints
+
+#### **Rate limits for each endpoint**
+
+* **1 request every `config.RATE_LIMIT_INTERVAL_S` seconds per IP**
+* **Maximum `config.MAX_READS_PER_DAY` requests per IP per day**
 
 ### 1. `/search`
 
@@ -71,11 +75,6 @@ Search meteorites using various filters, including name, class, date, mass, and 
 | `center_lat`  | number | Latitude of the center point for location filtering **(required with radius)** |
 | `center_long` | number | Longitude of the center point **(required with radius)**                       |
 | `radius`      | number | Radius in kilometers for location filtering **(required with center coords)**  |
-
-#### **Rate Limits**
-
-* **1 request every `config.RATE_LIMIT_INTERVAL_S` seconds per IP**
-* **Maximum `config.MAX_READS_PER_DAY` requests per IP per day**
 
 #### **Response**
 
@@ -120,11 +119,6 @@ Returns a randomly selected subset of meteorites, limited by a configurable maxi
 | Parameter | Type   | Description                                                                                                                                    |
 | --------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `count`   | number | Number of random meteorites to return. Defaults to `config.DEFAULT_RANDOM_NUMBER_OF_METEORITES`. Cannot exceed `config.MAX_RANDOM_METEORITES`. |
-
-#### **Rate Limits**
-
-* **1 request every `config.RATE_LIMIT_INTERVAL_S` seconds per IP**
-* **Maximum `config.MAX_READS_PER_DAY` requests per IP per day**
 
 #### **Response**
 
@@ -172,11 +166,6 @@ Or, if the `count` exceeded the maximum:
 Retrieve aggregated statistics about the entire meteorite dataset.
 
 Returns useful insights such as year ranges, mass stats, classification counts, and geolocation information.
-
-#### **Rate Limits**
-
-* **1 request every `config.RATE_LIMIT_INTERVAL_S` seconds per IP**
-* **Maximum `config.MAX_READS_PER_DAY` requests per IP per day**
 
 #### **Response**
 
@@ -233,29 +222,14 @@ Returns useful insights such as year ranges, mass stats, classification counts, 
 GET /stats
 ```
 
-## 🌐 CORS
-
-The API allows requests only from origins specified in the `ALLOWED_ORIGINS` environment variable.
-
-If the origin of the request is not in this whitelist, the request will be blocked with a CORS error.
-
-> If you're interested in building an awesome project with this API, feel free to contact me—I'm happy to add it to my instance.  
-
-**Please note:** this API is resource-intensive, particularly due to database reads, so I'm currently unable to provide `CORS` support.
-
-## ⚡ Rate Limiting
-
-* Rate limiting is applied per IP address.
-* Limits are configurable via `RATE_LIMIT_INTERVAL_S` (seconds) and `MAX_READS_PER_DAY` in `.env`. Actually, it's set to 20 reads per day and 1 request per second.
-* Exceeding limits returns `429 Too Many Requests`.
-
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache License v2.0](LICENSE).
 
 ## 📞 Contact
 
-Created and maintained by [Your Name](mailto:your.email@example.com).
-Feel free to reach out for questions or collaboration!
+Created and maintained by [Nde-Code](https://nde-code.github.io/).
+
+> Feel free to reach out for questions or collaboration, or open an issue or pull request and I'll be happy to help!
 
 *Happy meteorite hunting !* ☄️
