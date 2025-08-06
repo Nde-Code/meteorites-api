@@ -195,7 +195,7 @@ Search meteorites using various filters, including name, class, date, mass, and 
 
 * `200 OK`: Successful query with results
 
-* `400 Bad Request`: Missing or invalid coordinates
+* `400 Bad Request`: Missing or invalid parameters
 
 * `404 Not Found`: No meteorite data available
 

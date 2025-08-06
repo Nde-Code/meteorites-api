@@ -290,6 +290,10 @@ async function handler(req: Request): Promise<Response> {
 
 		};
 
+		const noFiltersProvided: boolean = Object.values(filters).every(value => value === null || value === undefined || value === "");
+
+		if (noFiltersProvided) return createJsonResponse({ "error": "At least one filter parameter must be provided in the query." }, 400);
+
 		const anyGeoParamProvided: boolean = filters.centerLat !== null || filters.centerLon !== null || filters.radius !== null;
 
 		const isInvalidCoord = (lat: number | null, lon: number | null, radius: number | null, minRadius: number, maxRadius: number): boolean => {
