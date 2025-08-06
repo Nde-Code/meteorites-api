@@ -48,8 +48,6 @@ export interface Meteorite {
 
 export interface filters {
 
-    name: string | null;
-
     recclass: string | null;
 
     fall: string | null;

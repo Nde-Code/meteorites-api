@@ -1,5 +1,7 @@
 import { Config, Meteorite } from "../types/types.ts";
 
+export function normalizeString(str: string): string { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+
 export function isConfigValidWithMinValues(config: Config, rules: Partial<Record<keyof Config, number>>): boolean {
 
     for (const [key, minValue] of Object.entries(rules)) {
@@ -32,79 +34,55 @@ function haversine(latitude_1: number, longitude_1: number, latitude_2: number, 
 
 }
 
-export function filterByDate(results: Meteorite[], year: number | null, minYear: number | null,maxYear: number | null): Meteorite[] {
-
-    if (year !== null) {
-
-        results = results.filter(m => {
-
-            const y: number = parseInt(m.year);
-
-            return !isNaN(y) && y === year;
-
-        });
-        
-    } else {
-
-        if (minYear !== null) {
-
-            results = results.filter(m => {
-
-                const y: number = parseInt(m.year);
-
-                return !isNaN(y) && y >= minYear;
-                
-            });
-
-        }
-
-        if (maxYear !== null) {
-
-            results = results.filter(m => {
-
-                const y: number = parseInt(m.year);
-
-                return !isNaN(y) && y <= maxYear;
-
-            });
-
-        }
-
-    }
-
-    return results;
+export function filterByDate(results: Meteorite[], year: number | null, minYear: number | null, maxYear: number | null): Meteorite[] {
     
+    return results.filter(m => {
+
+        if (typeof m.year !== "string") return false;
+
+        const y: number = parseInt(m.year);
+
+        if (isNaN(y)) return false;
+
+        if (year !== null) return y === year;
+
+        if (minYear !== null && y < minYear) return false;
+
+        if (maxYear !== null && y > maxYear) return false;
+
+        return true;
+
+    });
+
 }
 
 export function filterByMass(results: Meteorite[], mass: string | null, minMass: number | null, maxMass: number | null): Meteorite[] {
+    
+    return results.filter(m => {
 
-    if (mass) results = results.filter(m => String(m.mass) === mass);
+        if (m.mass === undefined || m.mass === null) return false;
 
-    if (minMass !== null) {
+        const massVal: number = parseFloat(String(m.mass));
 
-        results = results.filter(m => {
+        if (isNaN(massVal)) return false;
 
-            const massVal: number = parseFloat(m.mass);
+        if (mass !== null) {
 
-            return !isNaN(massVal) && massVal >= minMass;
+            const massFilterVal: number = parseFloat(mass);
 
-        });
-        
-    }
+            if (isNaN(massFilterVal)) return false; 
+            
+            if (massVal !== massFilterVal) return false;
 
-    if (maxMass !== null) {
+        }
 
-        results = results.filter(m => {
+        if (minMass !== null && massVal < minMass) return false;
 
-            const massVal: number = parseFloat(m.mass);
+        if (maxMass !== null && massVal > maxMass) return false;
 
-            return !isNaN(massVal) && massVal <= maxMass;
+        return true;
 
-        });
-
-    }
-
-    return results;
+    });
 
 }
 
@@ -116,6 +94,8 @@ export function filterByLocation(results: Meteorite[], centerLat: number | null,
 
     return results.filter(m => {
 
+        if (typeof m.latitude !== "string" || typeof m.longitude !== "string") return false;
+
         const latM: number = parseFloat(m.latitude);
 
         const lonM: number = parseFloat(m.longitude);
@@ -125,7 +105,7 @@ export function filterByLocation(results: Meteorite[], centerLat: number | null,
         return haversine(centerLat, centerLon, latM, lonM) <= radius;
 
     });
-    
+
 }
 
 export function getRecclassDistribution(meteorites: Meteorite[]): Record<string, number> {

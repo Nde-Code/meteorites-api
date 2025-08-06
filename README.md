@@ -1,4 +1,4 @@
-# NASA Meteorites Landings API
+# NASA Meteorites Landings API:
 
 A RESTful API built with **TypeScript** and **Deno** to query and analyze the NASA Meteorites Landings dataset.
 
@@ -10,13 +10,23 @@ This API is used in some projects:
 
  - [https://nde-code.github.io/online/meteorites-map](https://nde-code.github.io/online/meteorites-map)
 
-## 🚀 Features  
+## 🚀 Features:   
 
 - CORS: You're free to use the API in your website or any other project, but daily rate limits still apply.
+
+- No sign-up, no credit card, or other personal information required.
+
+- No logs are maintained to track user activity.
+
 - Rate limiting implemented to prevent API abuse.
+
 - GDPR compliant: IP addresses are hashed using `SHA-256` with a strong, secure key and stored for max a day.
+
 - Data Purge: The `meteorite_data` stored in Firebase Realtime Database has been cleaned to remove incomplete records (e.g., missing location, ...).
+
 - Accurate Search: You can apply multiple filters to tailor the request as precisely as needed.
+
+- Written in TypeScript with Deno runtime.
 
 ## 📦 Installation & Setup:
 
@@ -139,7 +149,7 @@ Here is a brief summary of these rules:
 | `YOUR_SECRET_PATH` | 🔓 Allows **read** access under that specific path only |
 |                    | ❌ **Still denies write** access under that path         |
 
-4. Upload the data. Go to [assets/meteorite_data.json](assets/meteorite_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
+4. Upload the data. Go to [data/meteorite_data.json](data/meteorite_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
 
 ### 5. Run the server:
 
@@ -151,9 +161,12 @@ deno task dev
 
 You're welcome to use my public online instance: [https://meteorites-api.deno.dev/](https://meteorites-api.deno.dev/)
 
+> By using this API, whether hosted on your own server or through its public online instance, you confirm that you have read and accepted all the information provided in the [README.md](https://github.com/Nde-Code/meteorites-api/blob/main/README.md) and in [privacy.md](https://github.com/Nde-Code/meteorites-api/blob/main/privacy.md)
+
 #### Rate limits for each endpoint:
 
 * **1 request every `config.RATE_LIMIT_INTERVAL_S` (1 with my instance) seconds per IP**
+
 * **Maximum `config.MAX_READS_PER_DAY` (15 with my instance) requests per IP per day**
 
 ### 1. **[GET]** `/search`:
@@ -164,8 +177,7 @@ Search meteorites using various filters, including name, class, date, mass, and 
 
 | Parameter     | Type   | Description                                                                |
 | ------------- | ------ | -------------------------------------------------------------------------- |
-| `name`        | string | Partial or full meteorite name (case-insensitive)                          |
-| `recclass`    | string | Meteorite classification (case-insensitive)                                |
+| `recclass`    | string | Meteorite classification                                |
 | `fall`        | string | Fall status (`Fell` or `Found`)                                            |
 | `year`        | number | Exact year the meteorite fell or was found                                 |
 | `minYear`     | number | Minimum year for filtering                                                 |
@@ -182,14 +194,17 @@ Search meteorites using various filters, including name, class, date, mass, and 
 #### **Response:**
 
 * `200 OK`: Successful query with results
+
 * `400 Bad Request`: Missing or invalid coordinates
+
 * `404 Not Found`: No meteorite data available
+
 * `429 Too Many Requests`: Rate limit exceeded
 
 #### **Example Request:**
 
 ```bash
-curl "https://meteorites-api.deno.dev/search?name=iron&year=1998&center_lat=45.0&center_long=5.0&radius=200"
+curl "https://meteorites-api.deno.dev/search?minYear=1998&center_lat=45.0&center_long=5.0&radius=2000"
 ```
 
 #### **Example Response:**
@@ -211,7 +226,69 @@ curl "https://meteorites-api.deno.dev/search?name=iron&year=1998&center_lat=45.0
 }
 ```
 
-### 2. **[GET]** `/random`:
+### 2. **[GET]** `/get`:
+
+Retrieve detailed information about a single meteorite by either its unique `id` or its exact `name`.
+
+#### **Query Parameters:**
+
+| Parameter | Type   | Description                                  |
+| --------- | ------ | --------------------------------------------|
+| `id`      | string | Unique identifier of the meteorite          |
+| `name`    | string | Exact name of the meteorite (case-insensitive, normalized) |
+
+> **Note:**  
+
+> - You **must provide either** `id` **or** `name`.
+
+> - Providing both parameters simultaneously will result in an error. 
+
+> - If neither is provided, the request will be rejected.
+
+#### **Response:**
+
+* `200 OK`: Meteorite found and returned  
+
+* `400 Bad Request`: Missing both parameters or both provided  
+
+* `404 Not Found`: No meteorite matches the given identifier  
+
+* `429 Too Many Requests`: Rate limit exceeded (per second or daily)
+
+#### **Example Requests:**
+
+Get meteorite by `id`:
+
+```bash
+curl "http://localhost:8000/get?id=12345"
+````
+
+Get meteorite by `name`:
+
+```bash
+curl "http://localhost:8000/get?name=Kopjes%20Vlei"
+```
+
+#### **Example Response:**
+
+```json
+{
+  "success": {
+    "meteorite": {
+      "fall": "Found",
+      "id": "12345",
+      "latitude": "-29.300000",
+      "longitude": "21.150000",
+      "mass": "13600",
+      "name": "Kopjes Vlei",
+      "recclass": "Iron, IIAB",
+      "year": "1914"
+    }
+  }
+}
+```
+
+### 3. **[GET]** `/random`:
 
 Get a random selection of meteorites.
 
@@ -228,7 +305,9 @@ Returns a randomly selected subset of meteorites, limited by a configurable maxi
 #### **Response:**
 
 * `200 OK`: Successfully returns a random list of meteorites.
+
 * `404 Not Found`: No meteorites data available.
+
 * `429 Too Many Requests`: Rate limit exceeded.
 
 If the requested `count` exceeds the maximum allowed, the result will be limited and a note will be included in the response.
@@ -266,7 +345,7 @@ Or, if the `count` exceeded the maximum:
 }
 ```
 
-### 3. **[GET]** `/stats`:
+### 4. **[GET]** `/stats`:
 
 Retrieve aggregated statistics about the entire meteorite dataset.
 
@@ -275,7 +354,9 @@ Returns useful insights such as year ranges, mass stats, classification counts, 
 #### **Response:**
 
 * `200 OK`: Statistics successfully returned
+
 * `404 Not Found`: No meteorite data available
+
 * `429 Too Many Requests`: Rate limit exceeded
 
 #### **Returned JSON Structure:**
@@ -319,7 +400,7 @@ Returns useful insights such as year ranges, mass stats, classification counts, 
 | `geolocated_count`         | number    | Number of meteorites with valid latitude and longitude  |
 | `fall_counts`              | object    | Breakdown of meteorites by fall type: `fell` vs `found` |
 
-> Some meteorites have a mass equal to 0. I've decided not to remove these entries, but keep in mind that it's possible to encounter them. In this case, the API excludes entries with a value of 0 from the statistics.
+> **Note:** Some meteorites are recorded with a mass of **0 grams**. This is not an error, but rather a reflection of specific characteristics—such as extreme alteration, fossilization, or missing recoverable fragments. It's important to recognize that these cases do occur. In such instances, the API automatically excludes entries with a mass of 0 from statistical analyses.
 
 #### **Example Request:**
 

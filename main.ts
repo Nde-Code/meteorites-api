@@ -8,7 +8,7 @@ import { Config, Meteorite, filters } from "./types/types.ts";
 
 import { config } from "./config.ts";
 
-import { isConfigValidWithMinValues, filterByDate, filterByLocation, filterByMass, getRecclassDistribution, getTrimmedParam, toNumber } from "./utilities/utils.ts";
+import { normalizeString, isConfigValidWithMinValues, filterByDate, filterByLocation, filterByMass, getRecclassDistribution, getTrimmedParam, toNumber } from "./utilities/utils.ts";
 
 async function handler(req: Request): Promise<Response> {
 
@@ -222,6 +222,36 @@ async function handler(req: Request): Promise<Response> {
 
 	}
 
+	if (req.method === "GET" && pathname === "/get") {
+
+		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse({ "warning": `Rate limit exceeded: only 1 request per ${config.RATE_LIMIT_INTERVAL_S}s allowed.` }, 429);
+
+		if (!(await checkDailyRateLimit(hashedIP))) return createJsonResponse({ "warning": `Rate limit exceeded: only ${config.MAX_READS_PER_DAY} requests per day allowed.` }, 429);
+
+		const query: URLSearchParams = url.searchParams;
+
+		const id: string | null = getTrimmedParam(query.get("id"));
+
+		const name: string | null = getTrimmedParam(query.get("name"));
+
+		if (!id && !name) return createJsonResponse({ "error": "Please provide either 'id' or 'name' as a query parameter." }, 400);
+
+		if (id && name) return createJsonResponse({ "error": "Please provide either 'id' or 'name', not both." }, 400);
+
+		const meteorites: Meteorite[] = await loadMeteorites();
+
+		let result: Meteorite | undefined;
+
+		if (id) result = meteorites.find(m => m.id && m.id === id);
+			
+		else if (name) result = meteorites.find(m => m.name && normalizeString(m.name) === normalizeString(name));
+
+		if (!result) return createJsonResponse({ "error": "No meteorite found for the given identifier." }, 404);
+
+		return createJsonResponse({ "success": { "meteorite": result } }, 200);
+
+	}
+
 	if (req.method === "GET" && pathname === "/search") {
 
 		if (!(await checkTimeRateLimit(hashedIP))) return createJsonResponse({ "warning": `Rate limit exceeded: only 1 request per ${config.RATE_LIMIT_INTERVAL_S}s allowed.` }, 429);
@@ -235,8 +265,6 @@ async function handler(req: Request): Promise<Response> {
 		const query: URLSearchParams = url.searchParams;
 
 		const filters: filters = {
-
-			name: getTrimmedParam(query.get("name")),
 
 			recclass: getTrimmedParam(query.get("recclass")),
 
@@ -262,21 +290,25 @@ async function handler(req: Request): Promise<Response> {
 
 		};
 
+		const anyGeoParamProvided: boolean = filters.centerLat !== null || filters.centerLon !== null || filters.radius !== null;
+
 		const isInvalidCoord = (lat: number | null, lon: number | null, radius: number | null, minRadius: number, maxRadius: number): boolean => {
-  			
+				
 			return (lat === null || isNaN(lat) || lat < -90 || lat > 90 || lon === null || isNaN(lon) || lon < -180 || lon > 180 || radius === null || isNaN(radius) || radius <= 0 || radius < minRadius || radius > maxRadius);
-		
+			
 		};
 
-  		if (isInvalidCoord(filters.centerLat, filters.centerLon, filters.radius, config.MIN_RADIUS, config.MAX_RADIUS)) return createJsonResponse({ error: "Missing required location parameters: center_lat, center_long, and radius." }, 400);
+		if (anyGeoParamProvided) {
+
+			if (isInvalidCoord(filters.centerLat, filters.centerLon, filters.radius, config.MIN_RADIUS, config.MAX_RADIUS)) return createJsonResponse({ error: "Missing required location parameters: center_lat, center_long, and radius." }, 400);
+		
+		}
 
 		let results = Object.values(meteoritesData);
 
-		if (filters.name) results = results.filter(m => m.name.toLowerCase().includes(filters.name!));
+		if (filters.recclass) results = results.filter(m => typeof m.recclass === "string" && m.recclass.toLowerCase() === filters.recclass!.toLowerCase());
 
-		if (filters.recclass) results = results.filter(m => m.recclass.toLowerCase().includes(filters.recclass!));
-
-		if (filters.fall) results = results.filter(m => m.fall.toLowerCase() === filters.fall!.toLowerCase());
+		if (filters.fall) results = results.filter(m => typeof m.fall === "string" && m.fall.toLowerCase() === filters.fall!.toLowerCase());
 
 		results = filterByDate(results, filters.year, filters.minYear, filters.maxYear);
 
