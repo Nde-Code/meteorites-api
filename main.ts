@@ -76,7 +76,7 @@ async function handler(req: Request): Promise<Response> {
 
 		const meteorites: Meteorite[] = await loadMeteorites();
 
-		if (!meteorites || meteorites.length === 0) return createJsonResponse({ error: "No meteorites data available." }, 404);
+		if (!meteorites || meteorites.length === 0) return createJsonResponse({ "error": "No meteorites data available." }, 404);
 
 		let minYear: number | null = null;
 
@@ -136,7 +136,7 @@ async function handler(req: Request): Promise<Response> {
 
 		return createJsonResponse({
 
-			success: {
+			"success": {
 
 				"meteorites_count": totalCount,
 
@@ -206,11 +206,11 @@ async function handler(req: Request): Promise<Response> {
 
 			{
 
-				success: {
+				"success": {
 
-					count: randomMeteorites.length,
+					"count": randomMeteorites.length,
 
-					meteorites: randomMeteorites,
+					"meteorites": randomMeteorites,
 
 					...(exceededMax && { note: `Requested count exceeded max limit. Returned ${config.MAX_RANDOM_METEORITES} items.` }),
 				
@@ -300,7 +300,7 @@ async function handler(req: Request): Promise<Response> {
 
 		if (anyGeoParamProvided) {
 
-			if (isInvalidCoord(filters.centerLat, filters.centerLon, filters.radius, config.MIN_RADIUS, config.MAX_RADIUS)) return createJsonResponse({ error: "Missing required location parameters: center_lat, center_long, and radius." }, 400);
+			if (isInvalidCoord(filters.centerLat, filters.centerLon, filters.radius, config.MIN_RADIUS, config.MAX_RADIUS)) return createJsonResponse({ "error": "Required location parameters are missing or invalid: center_lat, center_long and radius." }, 400);
 		
 		}
 
@@ -318,9 +318,9 @@ async function handler(req: Request): Promise<Response> {
 
 		results = results.slice(0, config.MAX_RETURNED_SEARCH_RESULTS);
 
-		if (results.length === 0) return createJsonResponse({ success: { count: 0, meteorites: [], note: "No results found for the given criteria." } }, 200);
+		if (results.length === 0) return createJsonResponse({ "success": { "count": 0, "meteorites": [], note: "No results found for the given criteria." } }, 200);
 
-  		return createJsonResponse({ success: { count: results.length, meteorites: results } }, 200);
+  		return createJsonResponse({ "success": { "count": results.length, "meteorites": results } }, 200);
 		
 	}
 

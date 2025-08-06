@@ -149,7 +149,7 @@ Here is a brief summary of these rules:
 | `YOUR_SECRET_PATH` | 🔓 Allows **read** access under that specific path only |
 |                    | ❌ **Still denies write** access under that path         |
 
-4. Upload the data. Go to [data/meteorite_data.json](data/meteorite_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
+4. Upload the data: go to [data/meteorite_data.json](data/meteorite_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
 
 ### 5. Run the server:
 
@@ -260,13 +260,13 @@ Retrieve detailed information about a single meteorite by either its unique `id`
 Get meteorite by `id`:
 
 ```bash
-curl "http://localhost:8000/get?id=12345"
+curl "https://meteorites-api.deno.dev/get?id=12345"
 ````
 
 Get meteorite by `name`:
 
 ```bash
-curl "http://localhost:8000/get?name=Kopjes%20Vlei"
+curl "https://meteorites-api.deno.dev/get?name=Kopjes%20Vlei"
 ```
 
 #### **Example Response:**
