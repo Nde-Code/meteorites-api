@@ -416,4 +416,4 @@ This project is licensed under the [Apache License v2.0](LICENSE).
 
 Created and maintained by [Nde-Code](https://nde-code.github.io/).
 
-> Feel free to reach out for questions or collaboration, or open an issue or pull request and I'll be happy to help !
+> Feel free to reach out for questions or collaboration, or open an issue or pull request and I'll be happy to help.
