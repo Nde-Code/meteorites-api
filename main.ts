@@ -294,6 +294,14 @@ async function handler(req: Request): Promise<Response> {
 
 		if (noFiltersProvided) return createJsonResponse({ "error": "At least one filter parameter must be provided in the query." }, 400);
 
+		if (filters.minYear !== null && filters.maxYear !== null && filters.minYear > filters.maxYear) return createJsonResponse({ "error": "Invalid year range: minYear cannot be greater than maxYear." }, 400);
+
+		if (filters.year !== null && (filters.minYear !== null || filters.maxYear !== null)) return createJsonResponse({ "error": "Cannot combine 'year' with 'minYear' or 'maxYear'." }, 400);
+
+		if (filters.minMass !== null && filters.maxMass !== null && filters.minMass > filters.maxMass) return createJsonResponse({ "error": "Invalid mass range: minMass cannot be greater than maxMass." }, 400);
+
+		if (filters.mass !== null && (filters.minMass !== null || filters.maxMass !== null)) return createJsonResponse({ "error": "Cannot combine 'mass' with 'minMass' or 'maxMass'." }, 400);
+
 		const anyGeoParamProvided: boolean = filters.centerLat !== null || filters.centerLon !== null || filters.radius !== null;
 
 		const isInvalidCoord = (lat: number | null, lon: number | null, radius: number | null, minRadius: number, maxRadius: number): boolean => {
