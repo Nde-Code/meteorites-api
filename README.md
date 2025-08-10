@@ -204,7 +204,7 @@ Search meteorites using various filters, including name, class, date, mass, and 
 #### **Example Request:**
 
 ```bash
-curl "https://meteorites-api.deno.dev/search?minYear=1998&center_lat=45.0&center_long=5.0&radius=2000"
+curl "https://meteorites-api.deno.dev/search?minYear=1998&center_lat=45.0&center_long=5.0&radius=200"
 ```
 
 #### **Example Response:**
@@ -215,11 +215,14 @@ curl "https://meteorites-api.deno.dev/search?minYear=1998&center_lat=45.0&center
     "count": 1,
     "meteorites": [
       {
-        "name": "Allende",
-        "mass": 2000,
-        "year": 1969,
-        "recclass": "CV3",
-        ...
+        "fall": "Fell",
+        "id": "458",
+        "latitude": "45.821330",
+        "longitude": "6.015330",
+        "mass": "252",
+        "name": "Alby sur Chéran",
+        "recclass": "Eucrite-mmict",
+        "year": "2002"
       }
     ]
   }
