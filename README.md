@@ -364,9 +364,9 @@ Or, if the `count` exceeded the maximum:
 ```json
 {
   "success": {
-    "count": 50,
+    "count": 100,
     "meteorites": [ ... ],
-    "note": "Requested count exceeded max limit. Returned 50 items."
+    "note": "Requested count exceeded max limit. Returned 100 items."
   }
 }
 ```
