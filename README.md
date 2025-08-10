@@ -240,13 +240,9 @@ Retrieve detailed information about a single meteorite by either its unique `id`
 | `id`      | string | Unique identifier of the meteorite          |
 | `name`    | string | Exact name of the meteorite (case-insensitive, normalized) |
 
-> **Note:**  
+**Note:**  
 
-> - You **must provide either** `id` **or** `name`.
-
-> - Providing both parameters simultaneously will result in an error. 
-
-> - If neither is provided, the request will be rejected.
+- You **must provide either** `id` **or** `name`. Providing both parameters simultaneously will result in an error. If neither is provided, the request will be rejected.
 
 #### **Response:**
 
@@ -318,7 +314,7 @@ If the requested `count` exceeds the maximum allowed, the result will be limited
 #### **Example Request:**
 
 ```bash
-curl "https://meteorites-api.deno.dev/random?count=10"
+curl "https://meteorites-api.deno.dev/random?count=3"
 ```
 
 #### **Example Response:**
@@ -328,9 +324,36 @@ curl "https://meteorites-api.deno.dev/random?count=10"
   "success": {
     "count": 3,
     "meteorites": [
-      { "name": "Allende", "mass": 2000, "year": 1969, ... },
-      { "name": "Chelyabinsk", "mass": 10000, "year": 2013, ... },
-      { "name": "Murchison", "mass": 100, "year": 1969, ... }
+      {
+        "fall": "Found",
+        "id": "20816",
+        "latitude": "-84.000000",
+        "longitude": "168.000000",
+        "mass": "8.9",
+        "name": "Queen Alexandra Range 97358",
+        "recclass": "L6",
+        "year": "1997"
+      },
+      {
+        "fall": "Found",
+        "id": "1738",
+        "latitude": "-76.716670",
+        "longitude": "159.666670",
+        "mass": "18.399999999999999",
+        "name": "Allan Hills A78123",
+        "recclass": "H5",
+        "year": "1978"
+      },
+      {
+        "fall": "Found",
+        "id": "19196",
+        "latitude": "-84.573660",
+        "longitude": "162.249660",
+        "mass": "5.4",
+        "name": "Queen Alexandra Range 93107",
+        "recclass": "H6",
+        "year": "1993"
+      }
     ]
   }
 }
@@ -354,6 +377,22 @@ Retrieve aggregated statistics about the entire meteorite dataset.
 
 Returns useful insights such as year ranges, mass stats, classification counts, and geolocation information.
 
+#### **Fields Explained:**
+
+| Field                      | Type      | Description                                             |
+| -------------------------- | --------- | ------------------------------------------------------- |
+| `meteorites_count`         | number    | Total number of meteorites                              |
+| `years`                    | number\[] | Sorted list of all available years in the dataset       |
+| `min_year`, `max_year`     | number    | Earliest and latest year of meteorite fall/found        |
+| `min_mass_g`, `max_mass_g` | number    | Smallest and largest mass in grams                      |
+| `avg_mass_g`               | number    | Average mass in grams (rounded to 2 decimal places)     |
+| `recclasses`               | string\[] | Sorted list of unique meteorite classifications         |
+| `recclasses_distribution`  | object    | Frequency of each classification                        |
+| `geolocated_count`         | number    | Number of meteorites with valid latitude and longitude  |
+| `fall_counts`              | object    | Breakdown of meteorites by fall type: `fell` vs `found` |
+
+> **Note:** Some meteorites are recorded with a mass of **0 grams**. This is not an error, but rather a reflection of specific characteristics—such as extreme alteration, fossilization, or missing recoverable fragments. It's important to recognize that these cases do occur. In such instances, the API automatically excludes entries with a mass of 0 from statistical analyses.
+
 #### **Response:**
 
 * `200 OK`: Statistics successfully returned
@@ -361,6 +400,12 @@ Returns useful insights such as year ranges, mass stats, classification counts, 
 * `404 Not Found`: No meteorite data available
 
 * `429 Too Many Requests`: Rate limit exceeded
+
+#### **Example Request:**
+
+```bash
+curl "https://meteorites-api.deno.dev/stats"
+```
 
 #### **Returned JSON Structure:**
 
@@ -387,28 +432,6 @@ Returns useful insights such as year ranges, mass stats, classification counts, 
     }
   }
 }
-```
-
-#### **Fields Explained:**
-
-| Field                      | Type      | Description                                             |
-| -------------------------- | --------- | ------------------------------------------------------- |
-| `meteorites_count`         | number    | Total number of meteorites                              |
-| `years`                    | number\[] | Sorted list of all available years in the dataset       |
-| `min_year`, `max_year`     | number    | Earliest and latest year of meteorite fall/found        |
-| `min_mass_g`, `max_mass_g` | number    | Smallest and largest mass in grams                      |
-| `avg_mass_g`               | number    | Average mass in grams (rounded to 2 decimal places)     |
-| `recclasses`               | string\[] | Sorted list of unique meteorite classifications         |
-| `recclasses_distribution`  | object    | Frequency of each classification                        |
-| `geolocated_count`         | number    | Number of meteorites with valid latitude and longitude  |
-| `fall_counts`              | object    | Breakdown of meteorites by fall type: `fell` vs `found` |
-
-> **Note:** Some meteorites are recorded with a mass of **0 grams**. This is not an error, but rather a reflection of specific characteristics—such as extreme alteration, fossilization, or missing recoverable fragments. It's important to recognize that these cases do occur. In such instances, the API automatically excludes entries with a mass of 0 from statistical analyses.
-
-#### **Example Request:**
-
-```bash
-curl "https://meteorites-api.deno.dev/stats"
 ```
 
 ## 📄 License:
