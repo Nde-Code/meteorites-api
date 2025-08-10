@@ -240,9 +240,7 @@ Retrieve detailed information about a single meteorite by either its unique `id`
 | `id`      | string | Unique identifier of the meteorite          |
 | `name`    | string | Exact name of the meteorite (case-insensitive, normalized) |
 
-**Note:**  
-
-- You **must provide either** `id` **or** `name`. Providing both parameters simultaneously will result in an error. If neither is provided, the request will be rejected.
+> **Note:** You must provide **either** `id` **or** `name`. Supplying **both** parameters will result in an error. If **neither** is provided, the request will be rejected.
 
 #### **Response:**
 
