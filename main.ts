@@ -336,7 +336,7 @@ async function handler(req: Request): Promise<Response> {
 		
 	}
 
-	if (req.method === "GET" && pathname === "/") return createJsonResponse({ "success": "Welcome to the API root. Please refer to the documentation before sending the request."}, 200)
+	if (req.method === "GET" && pathname === "/") return createJsonResponse({ "success": "Welcome to the API root. Please refer to the documentation on https://github.com/Nde-Code/meteorites-api."}, 200)
 
 	return createJsonResponse({ "error": "The requested endpoint is invalid." }, 404);
 
