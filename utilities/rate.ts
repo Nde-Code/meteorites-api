@@ -28,15 +28,29 @@ export async function checkTimeRateLimit(hashedIp: string): Promise<boolean> {
 
 export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
-    const today: string = getTodayDate();
+    const now: number = Date.now();
 
-    const key: string[] = ["ipDailyCounters", hashedIp];
+    const key: string[] = ["ip24hWindow", hashedIp];
 
-    const entry: Deno.KvEntryMaybe<{ date: string; count: number; }> = await kv.get<{ date: string; count: number }>(key);
+    type WindowData = { startTimestamp: number; count: number };
 
-    if (!entry.value || entry.value.date !== today) {
+    const entry = await kv.get<WindowData>(key);
 
-        await kv.set(key, { date: today, count: 1 }, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) });
+    if (!entry.value) {
+
+        const windowData: WindowData = { startTimestamp: now, count: 1 };
+
+        await kv.set(key, windowData, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) });
+
+        return true;
+
+    }
+
+    if (now - entry.value.startTimestamp >= (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000)) {
+
+        const windowData: WindowData = { startTimestamp: now, count: 1 };
+
+        await kv.set(key, windowData, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) });
 
         return true;
 
@@ -46,7 +60,7 @@ export async function checkDailyRateLimit(hashedIp: string): Promise<boolean> {
 
     entry.value.count++;
 
-    await kv.set(key, entry.value);
+    await kv.set(key, entry.value, { expireIn: (config.IPS_PURGE_TIME_DAYS * 24 * 60 * 60 * 1000) - (now - entry.value.startTimestamp) });
 
     return true;
 
