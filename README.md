@@ -6,7 +6,7 @@ Normally, this dataset comes as a CSV file with over 40,000 entries. I've compil
 
 > You can found the dataset here and by: [NASA Open Data Portal](https://data.nasa.gov/dataset/meteorite-landings)
 
-I’ve used this API in one of my projects: [https://nde-code.github.io/online/meteorites-map](https://nde-code.github.io/online/meteorites-map)
+I’ve used this API in one of my projects: [https://nde-code.github.io/online/meteorites-map](https://nde-code.github.io/online/meteorites-map) *(this is in French, which is my native language...)*
 
 ## 🚀 Features:   
 
