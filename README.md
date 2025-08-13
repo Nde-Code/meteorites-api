@@ -305,7 +305,7 @@ curl "https://meteorites-api.deno.dev/stats"
 
 ### 0. Prerequisites:
 
-- [Deno](https://deno.land/#installation) (v1.0+ recommended)
+- [Deno](https://deno.land/#installation)
 
 - [Firebase Realtime Database](https://firebase.google.com/products/realtime-database)
 
