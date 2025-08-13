@@ -26,135 +26,6 @@ I’ve used this API in one of my projects: [https://nde-code.github.io/online/m
 
 - Written in TypeScript with Deno runtime.
 
-## 📦 Installation & Setup:
-
-### 0. Prerequisites:
-
-- [Deno](https://deno.land/#installation) (v1.0+ recommended)
-
-- [Firebase Realtime Database](https://firebase.google.com/products/realtime-database)
-
-### 1. Clone the repo:
-
-```bash
-git clone https://github.com/Nde-Code/meteorites-api.git
-cd meteorites-api
-```
-
-### 2. Environment Variables:
-
-Create a `.env` file in the root folder with:
-
-```env
-FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
-FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
-HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
-```
-
-* **FIREBASE\_URL & FIREBASE\_HIDDEN\_PATH:** Firebase database connection info. Make sure `"YOUR_SECRET_PATH"` **is strong, safe and secure**.
-* **HASH\_KEY:** Key used for IP hashing in rate limiting.
-
-### 3. Open the `config.ts` file to customize settings:
-
-```ts
-export const config: Config = {
-
-  FIREBASE_URL: Deno.env.get("FIREBASE_HOST_LINK") ?? "",
-
-  FIREBASE_HIDDEN_PATH: Deno.env.get("FIREBASE_HIDDEN_PATH") ?? "",
-
-  HASH_KEY: Deno.env.get("HASH_KEY") ?? "",
-
-  RATE_LIMIT_INTERVAL_S: 1, // min: 1
-
-  MAX_READS_PER_DAY: 15, // min: 5
-
-  IPS_PURGE_TIME_DAYS: 1, // min: 1
-
-  FIREBASE_TIMEOUT_MS: 10000, // min: 6000
-
-  MAX_RANDOM_METEORITES: 1000, // min: 100
-
-  MAX_RETURNED_SEARCH_RESULTS: 300, // min: 100
-
-  MIN_RADIUS: 1, // min: 1
-
-  MAX_RADIUS: 5000, // min: 1000
-
-  DEFAULT_RANDOM_NUMBER_OF_METEORITES: 100 // min: 1000
-
-};
-```
-
-- **FIREBASE_URL**, **FIREBASE_HIDDEN_PATH**, **HASH_KEY**: These are values read from the `.env` file, so please **do not modify them**.
-
-- **RATE_LIMIT_INTERVAL_S** in [second]: This is the rate limit based on requests. Currently: one request per second.
-
-- **MAX_READS_PER_DAY** in [day]: Daily reading rate limit. Currently: 15 reads per day.
-
-- **IPS_PURGE_TIME_DAYS** in [day]: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Currently: 1 day.
-
-- **FIREBASE_TIMEOUT_MS** in [millisecond]: The timeout limit for HTTP requests to the Firebase Realtime Database. Currently: 10 seconds.
-
-- **MAX_RANDOM_METEORITES**: The maximum number of meteorites retrieved from `/random`. Currently: 1000 meteorites.
- 
-- **MAX_RETURNED_SEARCH_RESULTS**: The maximum number of meteorites retrieved from `/search` when the result set is large.
-
-- **MIN_RADIUS** & **MAX_RADIUS**: The minimum and maximum radius values allowed by the API to define the circular search area. Currently: `min = 1` and `max = 500`.
-
-- **DEFAULT_RANDOM_NUMBER_OF_METEORITES**: In `/random`, if no `count` parameter is provided, this is the default number of meteorites retrieved. Currently: 100 meteorites.
-
-### Ensure that you respect the `min` value specified in the comment; otherwise, you will get an error message with your configuration.
-
-### 4. Create a Firebase Realtime Database to store the dataset:
-
-1. Go to [firebase.google.com](https://firebase.google.com/) and create an account.  
-   > _(If you already have a Google account, you're good to go.)_
-
-2. Create a **project** and set up a `Realtime Database`.
-
-   > 🔍 If you get stuck, feel free to check out the official [Firebase documentation](https://firebase.google.com/docs/build?hl=en), or search on Google, YouTube, etc.
-
-3. Once your database is ready, go to the **`Rules`** tab and paste the following code in the editor:
-```JSON
-{
-  
-  "rules": {
-    
-    ".read": false,
-      
-    ".write": false,
-      
-    "YOUR_SECRET_PATH": {
-      
-      ".read": true, 
-        
-      ".write": false
-      
-    }
-  
-  }
-
-}
-```
-
-Here is a brief summary of these rules:
-
-| Rule               | Effect                                                  |
-| ------------------ | ------------------------------------------------------- |
-| `".read": false`   | ❌ **Default**: Deny read access to **entire database**  |
-| `".write": false`  | ❌ **Default**: Deny write access to **entire database** |
-| `YOUR_SECRET_PATH` | 🔓 Allows **read** access under that specific path only |
-|                    | ❌ **Still denies write** access under that path         |
-
-4. Upload the data: go to [data/meteorites_data.json](data/meteorites_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
-
-### 5. Run the server:
-
-```bash
-deno task dev
-```
-
 ## 📚 API Endpoints:
 
 You're welcome to use my public online instance: [https://meteorites-api.deno.dev/](https://meteorites-api.deno.dev/)
@@ -428,6 +299,135 @@ curl "https://meteorites-api.deno.dev/stats"
     }
   }
 }
+```
+
+## 📦 Installation & Setup:
+
+### 0. Prerequisites:
+
+- [Deno](https://deno.land/#installation) (v1.0+ recommended)
+
+- [Firebase Realtime Database](https://firebase.google.com/products/realtime-database)
+
+### 1. Clone the repo:
+
+```bash
+git clone https://github.com/Nde-Code/meteorites-api.git
+cd meteorites-api
+```
+
+### 2. Environment Variables:
+
+Create a `.env` file in the root folder with:
+
+```env
+FIREBASE_HOST_LINK="YOUR_FIREBASE_URL"
+FIREBASE_HIDDEN_PATH="YOUR_SECRET_PATH"
+HASH_KEY="THE_KEY_USED_TO_HASH_IPS"
+```
+
+* **FIREBASE\_URL & FIREBASE\_HIDDEN\_PATH:** Firebase database connection info. Make sure `"YOUR_SECRET_PATH"` **is strong, safe and secure**.
+* **HASH\_KEY:** Key used for IP hashing in rate limiting.
+
+### 3. Open the `config.ts` file to customize settings:
+
+```ts
+export const config: Config = {
+
+  FIREBASE_URL: Deno.env.get("FIREBASE_HOST_LINK") ?? "",
+
+  FIREBASE_HIDDEN_PATH: Deno.env.get("FIREBASE_HIDDEN_PATH") ?? "",
+
+  HASH_KEY: Deno.env.get("HASH_KEY") ?? "",
+
+  RATE_LIMIT_INTERVAL_S: 1, // min: 1
+
+  MAX_READS_PER_DAY: 15, // min: 5
+
+  IPS_PURGE_TIME_DAYS: 1, // min: 1
+
+  FIREBASE_TIMEOUT_MS: 10000, // min: 6000
+
+  MAX_RANDOM_METEORITES: 1000, // min: 100
+
+  MAX_RETURNED_SEARCH_RESULTS: 300, // min: 100
+
+  MIN_RADIUS: 1, // min: 1
+
+  MAX_RADIUS: 5000, // min: 1000
+
+  DEFAULT_RANDOM_NUMBER_OF_METEORITES: 100 // min: 1000
+
+};
+```
+
+- **FIREBASE_URL**, **FIREBASE_HIDDEN_PATH**, **HASH_KEY**: These are values read from the `.env` file, so please **do not modify them**.
+
+- **RATE_LIMIT_INTERVAL_S** in [second]: This is the rate limit based on requests. Currently: one request per second.
+
+- **MAX_READS_PER_DAY** in [day]: Daily reading rate limit. Currently: 15 reads per day.
+
+- **IPS_PURGE_TIME_DAYS** in [day]: The number of days before purging the `Deno.kv` store that contains hashed IPs used for rate limiting. Currently: 1 day.
+
+- **FIREBASE_TIMEOUT_MS** in [millisecond]: The timeout limit for HTTP requests to the Firebase Realtime Database. Currently: 10 seconds.
+
+- **MAX_RANDOM_METEORITES**: The maximum number of meteorites retrieved from `/random`. Currently: 1000 meteorites.
+ 
+- **MAX_RETURNED_SEARCH_RESULTS**: The maximum number of meteorites retrieved from `/search` when the result set is large.
+
+- **MIN_RADIUS** & **MAX_RADIUS**: The minimum and maximum radius values allowed by the API to define the circular search area. Currently: `min = 1` and `max = 500`.
+
+- **DEFAULT_RANDOM_NUMBER_OF_METEORITES**: In `/random`, if no `count` parameter is provided, this is the default number of meteorites retrieved. Currently: 100 meteorites.
+
+### Ensure that you respect the `min` value specified in the comment; otherwise, you will get an error message with your configuration.
+
+### 4. Create a Firebase Realtime Database to store the dataset:
+
+1. Go to [firebase.google.com](https://firebase.google.com/) and create an account.  
+   > _(If you already have a Google account, you're good to go.)_
+
+2. Create a **project** and set up a `Realtime Database`.
+
+   > 🔍 If you get stuck, feel free to check out the official [Firebase documentation](https://firebase.google.com/docs/build?hl=en), or search on Google, YouTube, etc.
+
+3. Once your database is ready, go to the **`Rules`** tab and paste the following code in the editor:
+```JSON
+{
+  
+  "rules": {
+    
+    ".read": false,
+      
+    ".write": false,
+      
+    "YOUR_SECRET_PATH": {
+      
+      ".read": true, 
+        
+      ".write": false
+      
+    }
+  
+  }
+
+}
+```
+
+Here is a brief summary of these rules:
+
+| Rule               | Effect                                                  |
+| ------------------ | ------------------------------------------------------- |
+| `".read": false`   | ❌ **Default**: Deny read access to **entire database**  |
+| `".write": false`  | ❌ **Default**: Deny write access to **entire database** |
+| `YOUR_SECRET_PATH` | 🔓 Allows **read** access under that specific path only |
+|                    | ❌ **Still denies write** access under that path         |
+
+4. Upload the data: go to [data/meteorites_data.json](data/meteorites_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
+
+### 5. Run the server:
+
+```bash
+deno task dev
 ```
 
 ## 📄 License:
