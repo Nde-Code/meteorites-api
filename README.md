@@ -357,7 +357,7 @@ curl "https://meteorites-api.deno.dev/random?count=3"
 
 Or, if the `count` exceeded the maximum:
 
-```json
+```js
 {
   "success": {
     "count": 100,
@@ -405,7 +405,7 @@ curl "https://meteorites-api.deno.dev/stats"
 
 #### **Returned JSON Structure:**
 
-```json
+```js
 {
   "success": {
     "meteorites_count": 45700,
