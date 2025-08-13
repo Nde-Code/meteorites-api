@@ -20,7 +20,7 @@ I’ve used this API in one of my projects: [https://nde-code.github.io/online/m
 
 - GDPR compliant: IP addresses are hashed using `SHA-256` with a strong, secure key and stored for max a day.
 
-- Data Purge: The `meteorite_data` stored in Firebase Realtime Database has been cleaned to remove incomplete records (e.g., missing location, ...).
+- Data Purge: The `meteorites_data` stored in Firebase Realtime Database has been cleaned to remove incomplete records (e.g., missing location, ...).
 
 - Accurate Search: You can apply multiple filters to tailor the request as precisely as needed.
 
@@ -147,7 +147,7 @@ Here is a brief summary of these rules:
 | `YOUR_SECRET_PATH` | 🔓 Allows **read** access under that specific path only |
 |                    | ❌ **Still denies write** access under that path         |
 
-4. Upload the data: go to [data/meteorite_data.json](data/meteorite_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
+4. Upload the data: go to [data/meteorites_data.json](data/meteorites_data.json), take the line **2** and replace `meteorites_key` by `YOUR_SECRET_PATH`. In the end, upload you file on your firebase RTDB. **Be careful: this will erase everything in your database before loading the new data. If you have other items stored, please make a backup first !!** 
 
 ### 5. Run the server:
 
