@@ -1,4 +1,4 @@
-import { Meteorite, MeteoritesKey } from "../types/types.ts";
+import { Meteorite, MeteoritesDBFormat } from "../types/types.ts";
 
 import { readInFirebaseRTDB } from "./read.ts";
 
@@ -14,7 +14,7 @@ export async function loadMeteorites(): Promise<Meteorite[]> {
 
     if (meteoritesLoadingPromise) return await meteoritesLoadingPromise;
 
-    meteoritesLoadingPromise = readInFirebaseRTDB<MeteoritesKey>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH)
+    meteoritesLoadingPromise = readInFirebaseRTDB<MeteoritesDBFormat>(config.FIREBASE_URL, config.FIREBASE_HIDDEN_PATH)
         
         .then((data) => { return meteoritesCache = data ? Object.values(data) : [] })
 

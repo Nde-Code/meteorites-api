@@ -72,4 +72,4 @@ export interface filters {
     
 }
 
-export type MeteoritesKey = Record<string, Meteorite>;
+export type MeteoritesDBFormat = Record<string, Meteorite>;
