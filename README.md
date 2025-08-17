@@ -98,6 +98,8 @@ curl "https://meteorites-api.deno.dev/search?minYear=1998&center_lat=45.0&center
 }
 ```
 
+> If the number of matching elements exceeds `MAX_RETURNED_SEARCH_RESULTS` (300 on my instance), only that number will be retrieved.
+
 ### 2. **[GET]** `/get`:
 
 Retrieve detailed information about a single meteorite by either its unique `id` or its exact `name`.
